@@ -1,0 +1,22 @@
+services:
+  uav_client:
+    build: ./UAV_Client
+    container_name: sentinel_uav
+    networks:
+      - sentinel_net
+    volumes:
+      - ./UAV_Client:/app
+
+  gks_server:
+    build: ./GKS_Server
+    container_name: sentinel_gks
+    networks:
+      - sentinel_net
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./GKS_Server:/app
+
+networks:
+  sentinel_net:
+    driver: bridge
