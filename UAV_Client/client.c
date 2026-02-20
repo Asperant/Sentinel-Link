@@ -5,14 +5,18 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
+struct TelemetryPacket{
+    int uav_id;
+    float speed;
+    float battery;
+} __attribute__((packed));
+
 #define SERVER_IP "172.18.0.3"
 #define PORT 5000
-#define BUFFER_SIZE 1024
 
 int main(){
     int sockfd;
     struct sockaddr_in server_addr;
-    char* message = "İHA-1: Uçuş Verisi [Hız: 100km/h]";
 
     if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
         perror("Socket oluşturulamadı");
@@ -27,12 +31,20 @@ int main(){
     printf("İHA Başlatıldı. Hedef: %s %d\n",SERVER_IP, PORT);
 
     while(1){
-        sendto(sockfd, (const char*) message, strlen(message),
-            MSG_CONFIRM, (const struct sockaddr*) &server_addr,
-            sizeof(server_addr));
-        
-        printf("Mesaj Gönderildi: %s\n",message);
+        struct TelemetryPacket packet;
+        packet.uav_id = 1;
+        packet.speed = 125.5;
+        packet.battery = 98.2;
 
+        int sent_bytes = sendto(sockfd, &packet, sizeof(packet), 0, (const struct sockaddr*) &server_addr, sizeof(server_addr));
+
+        if (sent_bytes < 0){
+            perror("Mesaj Gönderilemedi");
+        }
+        else{
+            printf("Binary Paket Gönderildi -> ID: %d | Hız: %.1f | Batarya: %.1f\n", 
+                   packet.uav_id, packet.speed, packet.battery);
+        }
         sleep(2);
     }
     close(sockfd);

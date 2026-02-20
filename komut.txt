@@ -1,0 +1,21 @@
+-docker sunucusunu ayağa kaldırma-
+docker compose up --build -d
+
+-dinleyici gks yi başlatma-
+docker exec -it sentinel_gks python3 server.py
+
+-iha konteynerine gir-
+docker exec -it sentinel_uav sh
+
+-makine diline çevir-
+gcc client.c -o uav_app
+
+-çalıştır-
+./uav_app
+
+
+
+
+
+-durdurmak isteyince her terminalde ctrl+c ve-
+docker compose down
