@@ -40,6 +40,7 @@ services:
       - DB_PASS=password123
       - DB_NAME=sentinel_hq
       - REDIS_HOST=redis_db
+      - AES_PSK=SuperSecretKey123456789012345678
     command: python -u server.py
     depends_on:
       redis_db:
@@ -50,11 +51,13 @@ services:
       - sentinel_net
   
   sentinel_uav:
-    image: gcc:latest
+    build: ./UAV_Client
     volumes:
       - .:/app
     working_dir: /app/UAV_Client
-    command: bash -c "g++ client.cpp -o uav_app && ./uav_app"
+    environment:
+      - AES_PSK=SuperSecretKey123456789012345678
+    command: bash -c "g++ client.cpp -lssl -lcrypto -o uav_app && ./uav_app"
     depends_on:
       - sentinel_gks
     networks:
